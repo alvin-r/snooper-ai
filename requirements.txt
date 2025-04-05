@@ -4,3 +4,9 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+
+anthropic>=0.18.0
+click>=8.1.7
+rich>=13.7.0
+openai>=1.12.0
+tomlkit>=0.12.4

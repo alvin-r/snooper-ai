@@ -1,3 +1,12 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.snooper-ai]
+provider = "claude"
+
+[tool.snooper-ai.claude]
+model = "claude-3-7-sonnet-latest"
+
+[tool.snooper-ai.openai]
+model = "gpt-4o"

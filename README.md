@@ -1,154 +1,111 @@
-# PySnooper - Never use print for debugging again
+# snooper-ai 🔍
 
-**PySnooper** is a poor man's debugger. If you've used Bash, it's like `set -x` for Python, except it's fancier.
-
-Your story: You're trying to figure out why your Python code isn't doing what you think it should be doing. You'd love to use a full-fledged debugger with breakpoints and watches, but you can't be bothered to set one up right now.
-
-You want to know which lines are running and which aren't, and what the values of the local variables are.
-
-Most people would use `print` lines, in strategic locations, some of them showing the values of variables.
-
-**PySnooper** lets you do the same, except instead of carefully crafting the right `print` lines, you just add one decorator line to the function you're interested in. You'll get a play-by-play log of your function, including which lines ran and   when, and exactly when local variables were changed.
-
-What makes **PySnooper** stand out from all other code intelligence tools? You can use it in your shitty, sprawling enterprise codebase without having to do any setup. Just slap the decorator on, as shown below, and redirect the output to a dedicated log file by specifying its path as the first argument.
-
-## Example
-
-We're writing a function that converts a number to binary, by returning a list of bits. Let's snoop on it by adding the `@pysnooper.snoop()` decorator:
-
-```python
-import pysnooper
-
-@pysnooper.snoop()
-def number_to_bits(number):
-    if number:
-        bits = []
-        while number:
-            number, remainder = divmod(number, 2)
-            bits.insert(0, remainder)
-        return bits
-    else:
-        return [0]
-
-number_to_bits(6)
-```
-The output to stderr is:
-
-![](https://i.imgur.com/TrF3VVj.jpg)
-
-Or if you don't want to trace an entire function, you can wrap the relevant part in a `with` block:
-
-```python
-import pysnooper
-import random
-
-def foo():
-    lst = []
-    for i in range(10):
-        lst.append(random.randrange(1, 1000))
-
-    with pysnooper.snoop():
-        lower = min(lst)
-        upper = max(lst)
-        mid = (lower + upper) / 2
-        print(lower, mid, upper)
-
-foo()
-```
-
-which outputs something like:
-
-```
-New var:....... i = 9
-New var:....... lst = [681, 267, 74, 832, 284, 678, ...]
-09:37:35.881721 line        10         lower = min(lst)
-New var:....... lower = 74
-09:37:35.882137 line        11         upper = max(lst)
-New var:....... upper = 832
-09:37:35.882304 line        12         mid = (lower + upper) / 2
-74 453.0 832
-New var:....... mid = 453.0
-09:37:35.882486 line        13         print(lower, mid, upper)
-Elapsed time: 00:00:00.000344
-```
+Debug your Python code with AI assistance. Get intelligent insights about your code's behavior using state-of-the-art language models.
 
 ## Features
 
-If stderr is not easily accessible for you, you can redirect the output to a file:
+- 🤖 AI-powered debugging insights using Claude or GPT-4
+- 🔄 Automatic fallback between providers
+- 🎨 Beautiful CLI interface
+- 🔍 Detailed execution tracing
+- ⚡️ Easy to use with decorators or context managers
+
+## Installation
+
+```bash
+pip install snooper-ai
+```
+
+## Quick Start
+
+1. First, configure your AI provider:
+```bash
+snoop config
+```
+
+2. Add the decorator to your function:
+```python
+from snooper_ai import snoop
+
+@snoop()
+def calculate_fibonacci(n):
+    if n <= 1:
+        return n
+    return calculate_fibonacci(n-1) + calculate_fibonacci(n-2)
+
+result = calculate_fibonacci(5)
+```
+
+3. Run your script with AI analysis:
+```bash
+snoop run your_script.py
+```
+
+4. Ask questions about the execution, and get AI-powered insights!
+
+## Configuration
+
+snooper-ai supports two AI providers:
+- Claude (Anthropic)
+- GPT-4 (OpenAI)
+
+You can configure your preferred provider and API keys in two ways:
+
+1. Using environment variables:
+```bash
+export ANTHROPIC_API_KEY=your_key_here
+# or
+export OPENAI_API_KEY=your_key_here
+```
+
+2. Using the configuration wizard:
+```bash
+snoop config
+```
+
+## Usage
+
+### Basic Usage
 
 ```python
-@pysnooper.snoop('/my/log/file.log')
+from snooper_ai import snoop
+
+# As a decorator
+@snoop()
+def your_function():
+    ...
+
+# As a context manager
+with snoop():
+    ...
 ```
 
-You can also pass a stream or a callable instead, and they'll be used.
+### CLI Commands
 
-See values of some expressions that aren't local variables:
+```bash
+# Show help
+snoop --help
 
-```python
-@pysnooper.snoop(watch=('foo.bar', 'self.x["whatever"]'))
+# Configure settings
+snoop config
+
+# Run a file with AI analysis
+snoop run your_script.py
+
+# Show execution trace while running
+snoop run --show-trace your_script.py
 ```
 
-Show snoop lines for functions that your function calls:
+## Requirements
 
-```python
-@pysnooper.snoop(depth=2)
-```
-
-**See [Advanced Usage](https://github.com/cool-RR/PySnooper/blob/master/ADVANCED_USAGE.md) for more options.** <------
-
-
-## Installation with Pip
-
-The best way to install **PySnooper** is with Pip:
-
-```console
-$ pip install pysnooper
-```
-
-## Other installation options
-
-Conda with conda-forge channel:
-
-```console
-$ conda install -c conda-forge pysnooper
-```
-
-Arch Linux:
-
-```console
-$ yay -S python-pysnooper
-```
-
-Fedora Linux:
-
-```console
-$ dnf install python3-pysnooper
-```
-
-
-## Citing PySnooper
-
-If you use PySnooper in academic work, please use this citation format:
-
-```bibtex
-@software{rachum2019pysnooper,
-    title={PySnooper: Never use print for debugging again},
-    author={Rachum, Ram and Hall, Alex and Yanokura, Iori and others},
-    year={2019},
-    month={jun},
-    publisher={PyCon Israel},
-    doi={10.5281/zenodo.10462459},
-    url={https://github.com/cool-RR/PySnooper}
-}
-```
-
+- Python 3.7+
+- anthropic>=0.18.0 (for Claude)
+- openai>=1.12.0 (for GPT-4)
 
 ## License
 
-Copyright (c) 2019 Ram Rachum and collaborators, released under the MIT license.
+MIT License
 
+## Contributing
 
-## Media Coverage
-
-[Hacker News thread](https://news.ycombinator.com/item?id=19717786)
-and [/r/Python Reddit thread](https://www.reddit.com/r/Python/comments/bg0ida/pysnooper_never_use_print_for_debugging_again/) (22 April 2019)
+Contributions are welcome! Please feel free to submit a Pull Request.

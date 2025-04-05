@@ -1,111 +1,98 @@
 # snooper-ai 🔍
 
-Debug your Python code with AI assistance. Get intelligent insights about your code's behavior using state-of-the-art language models.
+**snooper-ai** is a simple fork of PySnooper. It simply sends the entire execution trace to an LLM for debugging, so it fully understands what happened in your code.
 
-## Features
+Disclaimer: This was implemented simply and may not be very robust. Feel free to submit issues. 
 
-- 🤖 AI-powered debugging insights using Claude or GPT-4
-- 🔄 Automatic fallback between providers
-- 🎨 Beautiful CLI interface
-- 🔍 Detailed execution tracing
-- ⚡️ Easy to use with decorators or context managers
 
-## Installation
-
-```bash
-pip install snooper-ai
+## Usage:
+1. Store your LLM api key (either claude or openai):
 ```
-
-## Quick Start
-
-1. First, configure your AI provider:
-```bash
-snoop config
+ANTHROPIC_API_KEY=xxx
+OPENAI_API_KEY=xxx
 ```
-
-2. Add the decorator to your function:
+2. Add a decorator to the function you want to inquire:
 ```python
 from snooper_ai import snoop
 
 @snoop()
-def calculate_fibonacci(n):
-    if n <= 1:
-        return n
-    return calculate_fibonacci(n-1) + calculate_fibonacci(n-2)
+def number_to_bits(number):
+    if number:
+        bits = []
+        while number:
+            number, remainder = divmod(number, 2)
+            bits.insert(0, remainder)
+        return bits
+    else:
+        return [0]
 
-result = calculate_fibonacci(5)
+number_to_bits(6)
+```
+3. Run the file
+
+```
+snoop run file.py
+```
+4. Tell the LLM what you're confused about:
+```bash
+╭─────────────────────────────────────────────────╮
+│  🔍 snooper-ai: Debug your Python code with AI  │
+╰─────────────────────────────────────────────────╯
+
+What would you like to know about the code execution? (e.g. Error messages, unexpected behavior, etc.): 
 ```
 
-3. Run your script with AI analysis:
-```bash
-snoop run your_script.py
+5. Run it and get a detailed explanation!
+
+6. To choose which model you're using (This will be saved in your pyproject.toml):
 ```
-
-4. Ask questions about the execution, and get AI-powered insights!
-
-## Configuration
-
-snooper-ai supports two AI providers:
-- Claude (Anthropic)
-- GPT-4 (OpenAI)
-
-You can configure your preferred provider and API keys in two ways:
-
-1. Using environment variables:
-```bash
-export ANTHROPIC_API_KEY=your_key_here
-# or
-export OPENAI_API_KEY=your_key_here
-```
-
-2. Using the configuration wizard:
-```bash
 snoop config
 ```
 
-## Usage
+## More info
 
-### Basic Usage
+This is what gets sent to the LLM. Refer to the original PySnooper for more details
 
-```python
-from snooper_ai import snoop
 
-# As a decorator
-@snoop()
-def your_function():
-    ...
-
-# As a context manager
-with snoop():
-    ...
+```
+New var:....... i = 9
+New var:....... lst = [681, 267, 74, 832, 284, 678, ...]
+09:37:35.881721 line        10         lower = min(lst)
+New var:....... lower = 74
+09:37:35.882137 line        11         upper = max(lst)
+New var:....... upper = 832
+09:37:35.882304 line        12         mid = (lower + upper) / 2
+74 453.0 832
+New var:....... mid = 453.0
+09:37:35.882486 line        13         print(lower, mid, upper)
+Elapsed time: 00:00:00.000344
 ```
 
-### CLI Commands
 
-```bash
-# Show help
-snoop --help
+## Installation with Pip
 
-# Configure settings
-snoop config
+The best way to install **PySnooper** is with Pip:
 
-# Run a file with AI analysis
-snoop run your_script.py
-
-# Show execution trace while running
-snoop run --show-trace your_script.py
+```console
+$ pip install pysnooper
 ```
 
-## Requirements
+## Other installation options
 
-- Python 3.7+
-- anthropic>=0.18.0 (for Claude)
-- openai>=1.12.0 (for GPT-4)
+Conda with conda-forge channel:
 
-## License
+```console
+$ conda install -c conda-forge pysnooper
+```
 
-MIT License
+Arch Linux:
 
-## Contributing
+```console
+$ yay -S python-pysnooper
+```
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Fedora Linux:
+
+```console
+$ dnf install python3-pysnooper
+```

@@ -23,7 +23,7 @@ setuptools.setup(
     long_description=read_file('README.md'),
     long_description_content_type='text/markdown',
     url='https://github.com/alvinrputra/snooper-ai',  # Update with your repo
-    packages=setuptools.find_packages(exclude=['tests*']),
+    packages=setuptools.find_packages(exclude=['tests*']),  # This will find all packages including subpackages
     install_requires=[
         'anthropic>=0.18.0',
         'click>=8.1.7',

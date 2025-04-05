@@ -5,8 +5,16 @@ import re
 import abc
 import inspect
 import sys
+import time
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from pysnooper.utils import DEFAULT_REPR_RE
+import pytest
+
+import snooper_ai
+from snooper_ai import pycompat
+from snooper_ai.tracer import Tracer
+from snooper_ai.variables import needs_parentheses
+from snooper_ai.utils import DEFAULT_REPR_RE
 
 try:
     from itertools import zip_longest
@@ -14,8 +22,6 @@ except ImportError:
     from itertools import izip_longest as zip_longest
 
 from . import mini_toolbox
-
-import pysnooper.pycompat
 
 
 def get_function_arguments(function, exclude=()):
@@ -30,7 +36,7 @@ def get_function_arguments(function, exclude=()):
     return result
 
 
-class _BaseEntry(pysnooper.pycompat.ABC):
+class _BaseEntry(pycompat.ABC):
     def __init__(self, prefix='', min_python_version=None, max_python_version=None):
         self.prefix = prefix
         self.min_python_version = min_python_version
@@ -110,7 +116,7 @@ class ElapsedTimeEntry(_BaseEntry):
         match = self.line_pattern.match(s)
         if not match:
             return False
-        timedelta = pysnooper.pycompat.timedelta_parse(match.group('time'))
+        timedelta = pycompat.timedelta_parse(match.group('time'))
         if self.elapsed_time_value:
             return abs(timedelta.total_seconds() - self.elapsed_time_value) \
                                                               <= self.tolerance

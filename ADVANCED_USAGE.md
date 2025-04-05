@@ -3,18 +3,18 @@
 Use `watch_explode` to expand values to see all their attributes or items of lists/dictionaries:
 
 ```python
-@pysnooper.snoop(watch_explode=('foo', 'self'))
+@snooper_ai.snoop(watch_explode=('foo', 'self'))
 ```
 
 `watch_explode` will automatically guess how to expand the expression passed to it based on its class. You can be more specific by using one of the following classes:
 
 ```python
-import pysnooper
+import snooper_ai
 
-@pysnooper.snoop(watch=(
-    pysnooper.Attrs('x'),    # attributes
-    pysnooper.Keys('y'),     # mapping (e.g. dict) items
-    pysnooper.Indices('z'),  # sequence (e.g. list/tuple) items
+@snooper_ai.snoop(watch=(
+    snooper_ai.Attrs('x'),    # attributes
+    snooper_ai.Keys('y'),     # mapping (e.g. dict) items
+    snooper_ai.Indices('z'),  # sequence (e.g. list/tuple) items
 ))
 ```
 
@@ -36,19 +36,19 @@ New var:....... self.baz = 8
 Start all snoop lines with a prefix, to grep for them easily:
 
 ```python
-@pysnooper.snoop(prefix='ZZZ ')
+@snooper_ai.snoop(prefix='ZZZ ')
 ```
 
 Remove all machine-related data (paths, timestamps, memory addresses) to compare with other traces easily:
 
 ```python
-@pysnooper.snoop(normalize=True)
+@snooper_ai.snoop(normalize=True)
 ```
 
 On multi-threaded apps identify which thread are snooped in output:
 
 ```python
-@pysnooper.snoop(thread_info=True)
+@snooper_ai.snoop(thread_info=True)
 ```
 
 PySnooper supports decorating generators.
@@ -67,7 +67,7 @@ def print_list_size(l):
 def print_ndarray(a):
     return 'ndarray(shape={}, dtype={})'.format(a.shape, a.dtype)
 
-@pysnooper.snoop(custom_repr=((large, print_list_size), (numpy.ndarray, print_ndarray)))
+@snooper_ai.snoop(custom_repr=((large, print_list_size), (numpy.ndarray, print_ndarray)))
 def sum_to_x(x):
     l = list(range(x))
     a = numpy.zeros((10,10))
@@ -83,7 +83,7 @@ Variables and exceptions get truncated to 100 characters by default. You
 can customize that:
 
 ```python
-    @pysnooper.snoop(max_variable_length=200)
+    @snooper_ai.snoop(max_variable_length=200)
 ```
 
 You can also use `max_variable_length=None` to never truncate them.
@@ -94,5 +94,5 @@ wall time.
 The output is colored for easy viewing by default, except on Windows. Disable colors like so:
 
 ```python
-    @pysnooper.snoop(color=False)
+    @snooper_ai.snoop(color=False)
 ````

@@ -1,6 +1,6 @@
 # snooper-ai 🔍
 
-**snooper-ai** is a simple fork of PySnooper. It simply sends the entire execution trace to an LLM for debugging, so it fully understands what happened in your code.
+**snooper-ai** is a simple fork of [PySnooper](https://github.com/cool-RR/PySnooper). It simply sends the entire execution trace to an LLM for debugging, so it fully understands what happened in your code.
 
 Disclaimer: This was implemented simply and may not be very robust. Feel free to submit issues. 
 
@@ -39,7 +39,7 @@ snoop run file.py
 │  🔍 snooper-ai: Debug your Python code with AI  │
 ╰─────────────────────────────────────────────────╯
 
-What would you like to know about the code execution? (e.g. Error messages, unexpected behavior, etc.): 
+What would you like to know about the code execution? (e.g. Error messages, unexpected behavior, etc.):
 ```
 
 5. Run it and get a detailed explanation!
@@ -71,28 +71,8 @@ Elapsed time: 00:00:00.000344
 
 ## Installation with Pip
 
-The best way to install **PySnooper** is with Pip:
+The best way to install **snooper-ai** is with Pip:
 
 ```console
-$ pip install pysnooper
-```
-
-## Other installation options
-
-Conda with conda-forge channel:
-
-```console
-$ conda install -c conda-forge pysnooper
-```
-
-Arch Linux:
-
-```console
-$ yay -S python-pysnooper
-```
-
-Fedora Linux:
-
-```console
-$ dnf install python3-pysnooper
+$ pip install snooper-ai
 ```

@@ -177,7 +177,7 @@ class Tracer:
 
     This is useful for debugging.
 
-    When you decorate a function with `@pysnooper.snoop()`
+    When you decorate a function with `@snooper_ai.snoop()`
     or wrap a block of code in `with pysnooper.snoop():`, you'll get a log of
     every line that ran in the function and a play-by-play of every local
     variable that changed.
@@ -185,50 +185,50 @@ class Tracer:
     If stderr is not easily accessible for you, you can redirect the output to
     a file::
 
-        @pysnooper.snoop('/my/log/file.log')
+        @snooper_ai.snoop('/my/log/file.log')
 
     See values of some expressions that aren't local variables::
 
-        @pysnooper.snoop(watch=('foo.bar', 'self.x["whatever"]'))
+        @snooper_ai.snoop(watch=('foo.bar', 'self.x["whatever"]'))
 
     Expand values to see all their attributes or items of lists/dictionaries:
 
-        @pysnooper.snoop(watch_explode=('foo', 'self'))
+        @snooper_ai.snoop(watch_explode=('foo', 'self'))
 
     (see Advanced Usage in the README for more control)
 
     Show snoop lines for functions that your function calls::
 
-        @pysnooper.snoop(depth=2)
+        @snooper_ai.snoop(depth=2)
 
     Start all snoop lines with a prefix, to grep for them easily::
 
-        @pysnooper.snoop(prefix='ZZZ ')
+        @snooper_ai.snoop(prefix='ZZZ ')
 
     On multi-threaded apps identify which thread are snooped in output::
 
-        @pysnooper.snoop(thread_info=True)
+        @snooper_ai.snoop(thread_info=True)
 
     Customize how values are represented as strings::
 
-        @pysnooper.snoop(custom_repr=((type1, custom_repr_func1),
+        @snooper_ai.snoop(custom_repr=((type1, custom_repr_func1),
                          (condition2, custom_repr_func2), ...))
 
     Variables and exceptions get truncated to 100 characters by default. You
     can customize that:
 
-        @pysnooper.snoop(max_variable_length=200)
+        @snooper_ai.snoop(max_variable_length=200)
 
     You can also use `max_variable_length=None` to never truncate them.
 
     Show timestamps relative to start time rather than wall time::
 
-        @pysnooper.snoop(relative_time=True)
+        @snooper_ai.snoop(relative_time=True)
 
     The output is colored for easy viewing by default, except on Windows.
     Disable colors like so:
 
-        @pysnooper.snoop(color=False)
+        @snooper_ai.snoop(color=False)
 
     '''
     def __init__(self, output=None, watch=(), watch_explode=(), depth=1,

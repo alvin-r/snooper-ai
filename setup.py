@@ -17,12 +17,12 @@ version = re.findall(r"__version__ = '(.*)'",
 setuptools.setup(
     name='snooper-ai',
     version=version,
-    author='Alvin Ryan Putra',
-    author_email='TODO',  # Add your email
+    author='Alvin Ryanputra',
+    author_email='alvin.ryanputra@gmail.com',
     description='Debug your Python code with AI assistance',
     long_description=read_file('README.md'),
     long_description_content_type='text/markdown',
-    url='https://github.com/alvinrputra/snooper-ai',  # Update with your repo
+    url='https://github.com/alvin-r/snooper-ai',  # Update with your repo
     packages=setuptools.find_packages(exclude=['tests*']),  # This will find all packages including subpackages
     install_requires=[
         'anthropic>=0.18.0',

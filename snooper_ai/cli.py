@@ -43,12 +43,12 @@ def get_llm_provider(config: dict, api_key: Optional[str] = None):
             return ClaudeProvider(
                 api_key=api_key,
                 model=config["claude"]["model"]
-            )
+            ), provider
         elif provider == "openai":
             return OpenAIProvider(
                 api_key=api_key,
                 model=config["openai"]["model"]
-            )
+            ), provider
     except ValueError as e:
         # If primary provider fails, try the backup
         console.print(f"\n[warning]Failed to initialize {provider}: {e}[/warning]")
@@ -57,9 +57,9 @@ def get_llm_provider(config: dict, api_key: Optional[str] = None):
         backup_provider = "openai" if provider == "claude" else "claude"
         try:
             if backup_provider == "claude":
-                return ClaudeProvider(model=config["claude"]["model"])
+                return ClaudeProvider(model=config["claude"]["model"]), backup_provider
             else:
-                return OpenAIProvider(model=config["openai"]["model"])
+                return OpenAIProvider(model=config["openai"]["model"]), backup_provider
         except ValueError as e:
             raise ValueError(f"Failed to initialize both providers: {e}")
     
@@ -85,7 +85,7 @@ def run_file(file: str, api_key: str, show_trace: bool):
     try:
         # Show a welcome message
         console.print(Panel.fit(
-            "[success]🔍 snooper-ai[/success]: Debug your Python code with AI",
+            "[success]🔍 snooper-ai[/success] - Debug your Python code with AI",
             subtitle="",
             width=100,
             padding=(0, 2)
@@ -97,7 +97,7 @@ def run_file(file: str, api_key: str, show_trace: bool):
             config = setup_initial_config(console)
         
         # Get user's question
-        user_query = Prompt.ask("\n[info]What would you like to know about the code execution? (e.g. Error messages, unexpected behavior, etc.)")
+        user_query = Prompt.ask("\n[info]What would you like to know about the code execution?")
         
         # Show progress
         with console.status("[info]Running your code and capturing execution trace..."):
@@ -121,12 +121,12 @@ def run_file(file: str, api_key: str, show_trace: bool):
                 display_trace(trace_output)
         
         # Initialize LLM provider
-        with console.status(f"[info]Getting AI analysis using {config['provider'].title()}..."):
-            provider = get_llm_provider(config, api_key)
+        provider, actual_provider = get_llm_provider(config, api_key)
+        with console.status(f"[info]Getting AI analysis using {actual_provider.title()}..."):
             analysis = provider.analyze_trace(trace_output, user_query)
         
         # Display the analysis
-        console.print(f"\n[success]Analysis from {config['provider'].title()}:[/success]")
+        console.print(f"\n[success]Analysis from {actual_provider.title()}:[/success]")
         console.print(Panel(analysis, expand=False))
         
     except ValueError as e:
@@ -141,8 +141,8 @@ def configure():
     """Configure snooper-ai settings."""
     try:
         console.print(Panel.fit(
-            "[success]🔧 snooper-ai[/success]",
-            width=800,
+            "[success]🔧 snooper-ai[/success] - Configure your snooper-ai settings",
+            width=100,
             padding=(0, 2)
         ))
         

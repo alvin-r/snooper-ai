@@ -1,17 +1,21 @@
 # snooper-ai 🔍
 
-**snooper-ai** is a simple fork of [PySnooper](https://github.com/cool-RR/PySnooper). It simply sends the entire execution trace to an LLM for debugging, so it fully understands what happened in your code.
+**snooper-ai** is a simple fork of [PySnooper](https://github.com/cool-RR/PySnooper). It sends the entire execution trace (variable values you'll typically examine in a debugger) to an LLM for debugging, so it fully understands what happened in your code.
 
 Disclaimer: This was implemented simply and may not be very robust. Feel free to submit issues. 
 
 
 ## Usage:
-1. Store your LLM api key (either claude or openai):
+1. Install
+```
+pip install snooper-ai
+```
+2. Store your LLM api key (either anthropic or openai):
 ```
 ANTHROPIC_API_KEY=xxx
 OPENAI_API_KEY=xxx
 ```
-2. Add a decorator to the function you want to inquire:
+3. Add a decorator to the function you want to inquire:
 ```python
 from snooper_ai import snoop
 
@@ -28,12 +32,12 @@ def number_to_bits(number):
 
 number_to_bits(6)
 ```
-3. Run the file
+4. Run the file
 
 ```
 snoop run file.py
 ```
-4. Tell the LLM what you're confused about:
+5. Tell the LLM what you're confused about:
 ```bash
 ╭─────────────────────────────────────────────────╮
 │  🔍 snooper-ai: Debug your Python code with AI  │
@@ -42,16 +46,16 @@ snoop run file.py
 What would you like to know about the code execution? (e.g. Error messages, unexpected behavior, etc.):
 ```
 
-5. Run it and get a detailed explanation!
+6. Run it and get a detailed explanation!
 
-6. To choose which model you're using (This will be saved in your pyproject.toml):
+7. To choose which model you're using (This will be saved in your pyproject.toml):
 ```
 snoop config
 ```
 
 ## More info
 
-This is what gets sent to the LLM. Refer to the original PySnooper for more details
+This is what gets sent to the LLM. Refer to the original [PySnooper](https://github.com/cool-RR/PySnooper) for more details
 
 
 ```
@@ -66,13 +70,4 @@ New var:....... upper = 832
 New var:....... mid = 453.0
 09:37:35.882486 line        13         print(lower, mid, upper)
 Elapsed time: 00:00:00.000344
-```
-
-
-## Installation with Pip
-
-The best way to install **snooper-ai** is with Pip:
-
-```console
-$ pip install snooper-ai
 ```

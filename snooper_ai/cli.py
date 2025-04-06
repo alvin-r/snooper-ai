@@ -4,7 +4,7 @@ Command-line interface for snooper-ai.
 import io
 import os
 import sys
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, redirect_stderr
 from pathlib import Path
 from typing import Optional
 
@@ -103,18 +103,29 @@ def run_file(file: str, api_key: str, show_trace: bool):
         with console.status("[info]Running your code and capturing execution trace..."):
             # Capture PySnooper output
             output_buffer = io.StringIO()
-            with redirect_stdout(output_buffer):
-                # Get the file's directory to properly handle imports
-                file_dir = str(Path(file).parent)
-                if file_dir not in sys.path:
-                    sys.path.insert(0, file_dir)
-                
-                # Execute the Python file
-                with open(file) as f:
-                    # Use globals() to ensure imports work correctly
-                    exec(f.read(), globals(), globals())
+            error_buffer = io.StringIO()
+            
+            try:
+                with redirect_stdout(output_buffer), redirect_stderr(error_buffer):
+                    # Get the file's directory to properly handle imports
+                    file_dir = str(Path(file).parent)
+                    if file_dir not in sys.path:
+                        sys.path.insert(0, file_dir)
+                    
+                    # Execute the Python file
+                    with open(file) as f:
+                        # Use globals() to ensure imports work correctly
+                        exec(f.read(), globals(), globals())
+            except Exception as e:
+                # Capture the error and traceback
+                import traceback
+                error_trace = traceback.format_exc()
+                error_buffer.write(error_trace)
+                console.print(f"\n[error]Error occurred during execution:[/error]")
+                console.print(Panel(error_trace, title="Error Details", style="red"))
             
             trace_output = output_buffer.getvalue()
+            error_output = error_buffer.getvalue()
             
             if show_trace:
                 console.print("\n[info]Execution trace:[/info]")
@@ -122,8 +133,14 @@ def run_file(file: str, api_key: str, show_trace: bool):
         
         # Initialize LLM provider
         provider, actual_provider = get_llm_provider(config, api_key)
+        
+        # Prepare analysis input
+        analysis_input = trace_output
+        if error_output:
+            analysis_input += "\n\nError occurred:\n" + error_output
+        
         with console.status(f"[info]Getting AI analysis using {actual_provider.title()}..."):
-            analysis = provider.analyze_trace(trace_output, user_query)
+            analysis = provider.analyze_trace(analysis_input, user_query)
         
         # Display the analysis
         console.print(f"\n[success]Analysis from {actual_provider.title()}:[/success]")

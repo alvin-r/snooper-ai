@@ -55,7 +55,7 @@ User's question about the execution:
 
 Please analyze the trace and answer the question, providing specific examples from the trace
 where relevant."""
-
+        # print(user_message)
         response = self.client.messages.create(
             model=self.model,
             system=system_prompt,

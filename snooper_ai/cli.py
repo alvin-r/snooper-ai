@@ -30,9 +30,8 @@ custom_theme = Theme({
 console = Console(theme=custom_theme)
 
 def display_trace(trace_output: str):
-    """Display the trace output in a nice panel."""
-    syntax = Syntax(trace_output, "python", theme="monokai", line_numbers=True)
-    console.print(Panel(syntax, title="[info]Execution Trace", expand=False))
+    """Display the trace output."""
+    print(trace_output)
 
 def get_llm_provider(config: dict, api_key: Optional[str] = None):
     """Get the appropriate LLM provider based on configuration."""
@@ -68,7 +67,15 @@ def get_llm_provider(config: dict, api_key: Optional[str] = None):
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
-    """snooper-ai - Debug your Python code with AI assistance."""
+    """snooper-ai - Debug your Python code with AI assistance.
+
+    Available commands:
+        run     Run a Python file with AI-enhanced debugging
+                Example: snooper run script.py --show-trace
+        
+        config  Configure snooper-ai settings
+                Example: snooper config
+    """
     if ctx.invoked_subcommand is None:
         click.echo(ctx.get_help())
 
@@ -76,11 +83,17 @@ def cli(ctx):
 @click.argument('file', type=click.Path(exists=True, dir_okay=False))
 @click.option('--api-key', help='API key for the selected provider')
 @click.option('--show-trace/--no-show-trace', default=False,
-              help='Show the raw execution trace (default: False)')
+              help='Show the detailed execution trace including variable changes and line execution (default: False)')
 def run_file(file: str, api_key: str, show_trace: bool):
     """Run a Python file with AI-enhanced debugging.
     
-    FILE is the Python file to analyze.
+    FILE is the Python file to analyze. The file should use @snoop() decorator
+    to enable tracing of the code execution.
+    
+    Examples:
+        snooper run my_script.py
+        snooper run my_script.py --show-trace
+        snooper run my_script.py --api-key your-api-key
     """
     try:
         # Show a welcome message
@@ -101,46 +114,38 @@ def run_file(file: str, api_key: str, show_trace: bool):
         
         # Show progress
         with console.status("[info]Running your code and capturing execution trace..."):
-            # Capture PySnooper output
+            # Capture all output in a single buffer
             output_buffer = io.StringIO()
-            error_buffer = io.StringIO()
             
             try:
-                with redirect_stdout(output_buffer), redirect_stderr(error_buffer):
+                with redirect_stdout(output_buffer), redirect_stderr(output_buffer):
                     # Get the file's directory to properly handle imports
                     file_dir = str(Path(file).parent)
                     if file_dir not in sys.path:
                         sys.path.insert(0, file_dir)
                     
-                    # Execute the Python file
-                    with open(file) as f:
-                        # Use globals() to ensure imports work correctly
-                        exec(f.read(), globals(), globals())
+                    # Execute the Python file as a module
+                    import importlib.util
+                    spec = importlib.util.spec_from_file_location("module", file)
+                    module = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(module)
             except Exception as e:
                 # Capture the error and traceback
                 import traceback
                 error_trace = traceback.format_exc()
-                error_buffer.write(error_trace)
+                output_buffer.write("\n\nError occurred:\n" + error_trace)
                 console.print(f"\n[error]Error occurred during execution:[/error]")
                 console.print(Panel(error_trace, title="Error Details", style="red"))
             
             trace_output = output_buffer.getvalue()
-            error_output = error_buffer.getvalue()
-            
             if show_trace:
-                console.print("\n[info]Execution trace:[/info]")
-                display_trace(trace_output)
+                print(f"{trace_output}")
         
         # Initialize LLM provider
         provider, actual_provider = get_llm_provider(config, api_key)
         
-        # Prepare analysis input
-        analysis_input = trace_output
-        if error_output:
-            analysis_input += "\n\nError occurred:\n" + error_output
-        
         with console.status(f"[info]Getting AI analysis using {actual_provider.title()}..."):
-            analysis = provider.analyze_trace(analysis_input, user_query)
+            analysis = provider.analyze_trace(trace_output, user_query)
         
         # Display the analysis
         console.print(f"\n[success]Analysis from {actual_provider.title()}:[/success]")
